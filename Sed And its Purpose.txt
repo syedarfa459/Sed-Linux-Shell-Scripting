@@ -1,0 +1,18 @@
+------------------------> Topics to cover <------------------------
+
+sed grep egrep fgrep awk uniq cut sort locate find tar 
+
+------------------------> 1. SED <------------------------
+
+What Sed does?
+
+	SED works on line numbers of a file
+
+		-> It can help you print a line number content
+
+		-> We can do find and replace operations on the content of file
+
+		-> We can delete content of a line 
+
+		-> It helps us perform insertion,append before and after a particular line number
+

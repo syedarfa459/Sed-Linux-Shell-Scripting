@@ -1,0 +1,54 @@
+
+******************* Printing content through SED *******************
+
+
+1. First create a file using 'touch' as
+
+	~/$ touch one.txt
+
+2. Add content in the file using 'cat' as
+
+	~/$ cat > one.txt
+
+3. After adding content and saving content then use 'sed' command to print the content of 'one.txt' as
+
+	~/$ sed -n '1p' 'one.txt' 	'p' stands for 'print operation'
+
+   What the above command does is that it would print the 1st line in 'one.txt'
+
+	~/$ sed -n '1,10p' 'one.txt'
+
+   The above command will print lines of 'one.txt' from 1st till 10th line
+
+	~/$ sed -n '1p;5p' 'one.txt'
+
+   The above command will print 1st and the 5th line of 'one.txt' 
+
+4. If we want to print range of lines we use " sed -n 'start,endp' 'file' "
+
+5. If we want to print specific rows content then we use " sed -n '100p;150p' 'file' " (prints 100th row and 150th row of file)
+
+6. If you want to get the content of 'one.txt' from 1st line till the last line and want to store this in output.txt then
+
+	~/$ sed -n '1,$p' 'one.txt' > output.txt
+
+6. Bonus Examples
+
+	1.  Let's suppose you want to print some lines and want to store them in a separate file after printing them, 
+	    then by using sed we can do this as
+
+			~/$ sed -n '1,100p;150p;200,250p' 'one.txt' > output.txt
+
+	    What the above command does is that it will execute sed -n '1,100p;150p;200,250p' 'one.txt' first and
+            this will print lines of one.txt starting from 1st line till the 100th and then print 150th and then 
+	    prints 200th till 250th and then store all these lines 1-100th,150th and 200-250th row content in output.txt
+
+	2.  Let's say you want to read content from a file suppose 1st 100 lines of a file named 'hello.txt' and then you
+	    want to print line numbers with the content then we can do this using sed as
+
+			~/$ cat -n 'hello.txt' | sed -n '1,100p'
+	
+	    What the above command will do is that it will first execute cat -n 'hello.txt' what this command does is that
+	    it will assign row numbers to all the lines in hello.txt and then pass all file content to sed -n '1,100p'
+	    via "|" and then using sed you'll print 1st till 100th line content 
+

@@ -1,0 +1,258 @@
+
+******************* Find and Replace through SED *******************
+
+******************* On Screen Replacement *******************
+
+1. At this point we know that sed works on line numbers in a file. Now to start with Find and Replace operation
+
+	~/$ lscpu | cat -n | sed -n '1,15p' >  cpuspecs.txt
+
+	The above command executes as
+
+		1. First lscpu is executed which lists the specs of your cpu
+
+		2. Then the output is given to cat -n using "|" what this will do is it will assign line numbers to
+		   all the rows returned by lscpu in first step
+
+		3. Then output with line numbers inserted before start of each line is give to sed -n '1,15p' using "|"
+		   what this does is that it will pick 1st till 15th lines
+
+		4. And finally the 15 lines worth of output is stored in cpuspecs.txt as
+
+			     1  Architecture:                    x86_64
+     			     2  CPU op-mode(s):                  32-bit, 64-bit
+     		 	     3  Byte Order:                      Little Endian
+                             4  Address sizes:                   46 bits physical, 48 bits virtual
+                             5  CPU(s):                          4
+                             6  On-line CPU(s) list:             0-3
+                             7  Thread(s) per core:              2
+                             8  Core(s) per socket:              2
+                             9  Socket(s):                       1
+                             10  NUMA node(s):                    1
+                             11  Vendor ID:                       GenuineIntel
+                             12  CPU family:                      6
+                             13  Model:                           85
+                             14  Model name:                      Intel(R) Xeon(R) CPU @ 2.80GHz
+                             15  Stepping:                        7
+
+
+2. Now we'll work on spuspecs.txt which consists of 15 lines of text. Let us say we need to replace the word "Architectrue" with "Architecture,Architecture,Architecture"
+
+	~/$ sed '1s/Architecture/Architecture,Architecture,Architecture/' cpuspecs.txt
+
+	Let's understand what happens in above command step by step
+
+		1. '1s' means substituting only in 1st line
+		2. '1s/Archtecture/Architecture,Architecture,Architecture/' means in first line, if the word Architecture exists 
+		    then replace it with Architecture,Architecture,Architecture
+		3.  sed '1s/Architecture/Architecture,Architecture,Architecture/' cpuspecs.txt and from file cpuspecs.txt
+		4.  Run
+ 
+			sed '1s/Architecture/Architecture,Architecture,Architecture/' cpuspecs.txt | head -5
+
+		    this command will get input from command '1s/Architecture/Architecture,Architecture,Architecture/' cpuspecs.txt
+		    and then print only 1st 5 lines as
+			    1  Architecture,Architecture,Architecture:                    x86_64
+    			    2  CPU op-mode(s):                  32-bit, 64-bit
+     			    3  Byte Order:                      Little Endian
+                            4  Address sizes:                   46 bits physical, 48 bits virtual
+                            5  CPU(s):                          4
+		5. Lets say we stored the above 5 lines in newspecs.txt as 
+
+			sed '1s/Architecture/Architecture,Architecture,Architecture/' cpuspecs.txt | head -5  > newspecs.txt
+
+		   Now the above 5 line output is stored in file newspecs.txt
+
+
+3. At this point, we will now work with newspecs.txt. Use the following to view newspecs.txt content 
+	
+	~/$ cat newspecs.txt
+
+	                    1  Architecture,Architecture,Architecture:                    x86_64
+    			    2  CPU op-mode(s):                  32-bit, 64-bit
+     			    3  Byte Order:                      Little Endian
+                            4  Address sizes:                   46 bits physical, 48 bits virtual
+                            5  CPU(s):                          4
+
+
+4. Again if at this stage, working with 'newspecs.txt', I use the following command
+
+	~/$ sed '1s/Architecture/Architonics/' newspecs.txt
+
+   After running the above command the output appears to be as 
+	1  Architonics,Architecture,Architecture:                    x86_64
+        2  CPU op-mode(s):                  32-bit, 64-bit
+        3  Byte Order:                      Little Endian
+        4  Address sizes:                   46 bits physical, 48 bits virtual
+        5  CPU(s):                          4
+   You noticed that when sed '1s/Architecture/Architonics/' newspecs.txt is executed, we are interested in making find and replace in 1st line 
+   as 1s is used, you come to know that only 1st occurance of the word is replaced here. But we are interested in making replace of all 3 occurances
+   of word Architecture in 1st line of 'newspecs.txt'
+
+5. Now, if we want to make replacement to all occurances of a word in a file what we do is listed in below command
+	
+	~/$ sed '1s/Architecture/Architonics/g' newspecs.txt
+
+     1  Architonics,Architonics,Architonics:                    x86_64
+     2  CPU op-mode(s):                  32-bit, 64-bit
+     3  Byte Order:                      Little Endian
+     4  Address sizes:                   46 bits physical, 48 bits virtual
+     5  CPU(s):                          4
+
+     Now here 1s is used which means we are interested in making substitution in 1st line only and g flag is used at the end in '1s/Architecture/Architonics/g'
+     which makes the replacement to all the occurances
+
+6. Now, at this point if you execute ~/$ cat newspecs.txt you find that the orignal content is not replaced that's why we stored the output 
+   of sed find and replace in an extra file in the 2nd step (2nd and its 5th sub step)
+
+
+7. At this stage we again execute 
+	
+	~/$ cat newspecs.txt 
+	
+	output is as
+
+     1  Architecture,Architecture,Architecture:                    x86_64
+     2  CPU op-mode(s):                  32-bit, 64-bit
+     3  Byte Order:                      Little Endian
+     4  Address sizes:                   46 bits physical, 48 bits virtual
+     5  CPU(s):                          4
+
+	~/$ sed '5s/CPU/Architecture,NumberofCPUs/g' newspecs.txt  > updatedspecs.txt          
+	
+	"5s means 5th line g means all occurances of CPU" and output is stored in updatedspecs.txt
+	
+  After executing ~/$ cat updatedspecs.txt we find the content in it as
+
+     1  Architecture,Architecture,Architecture:                    x86_64
+     2  CPU op-mode(s):                  32-bit, 64-bit
+     3  Byte Order:                      Little Endian
+     4  Address sizes:                   46 bits physical, 48 bits virtual
+     5  Architecture,NumberofCPUs(s):                          4
+
+
+8. Now we'll work with 'updatedspecs.txt'. If you want to replace all the occurances of word Architecture in file 'updatedspecs.txt'
+   
+	~/$ sed 's/Architecture/Architonics/g' updatedspecs.txt         "s means all substitutions"
+
+   Output
+
+     1  Architonics,Architonics,Architonics:                    x86_64
+     2  CPU op-mode(s):                  32-bit, 64-bit
+     3  Byte Order:                      Little Endian
+     4  Address sizes:                   46 bits physical, 48 bits virtual
+     5  Architonics,NumberofCPUs(s):                          4
+
+	
+9. If we want to make substituions lets say if the Architecture word exist in 1st 2 lines and the 5th line as
+
+	~/$ sed 's/CPU/Architecture/g' updatedspecs.txt
+
+   Output
+
+     1  Architecture,Architecture,Architecture:                    x86_64
+     2  Architecture op-mode(s):                  32-bit, 64-bit
+     3  Byte Order:                      Little Endian
+     4  Address sizes:                   46 bits physical, 48 bits virtual
+     5  Architecture,NumberofArchitectures(s):                          4
+
+
+10. Now we want to replace Architecture with architonics in between only 1st two lines of file and not the 5th line we do as
+
+	~/$ sed 's/CPU/Architecture/g' updatedspecs.txt | sed '1,2s/Architecture/Architonics/g'                  "1,2s means starting from line 1 making subs till 2nd line"
+
+   Output
+
+     1  Architonics,Architonics,Architonics:                    x86_64
+     2  Architonics op-mode(s):                  32-bit, 64-bit
+     3  Byte Order:                      Little Endian
+     4  Address sizes:                   46 bits physical, 48 bits virtual
+     5  Architecture,NumberofArchitectures(s):                          4 
+
+11. Bonus Example
+
+	~/$ cat newspecs.txt
+
+     1  Architecture,Architecture,Architecture:                    x86_64
+     2  CPU op-mode(s):                  32-bit, 64-bit
+     3  Byte Order:                      Little Endian
+     4  Address sizes:                   46 bits physical, 48 bits virtual
+     5  CPU(s):                          4
+
+	Now is we want an insensitive case matching as
+
+	~/$ sed 's/ARCHITECTURE/Architonics/gi' newspecs.txt            "here i is used with g meaning globaly and insensitive replace architecure,ARCHITECTURE or what so ever be the upper,lower pattern"
+
+    Output 
+
+     1  Architonics,Architonics,Architonics:                    x86_64
+     2  CPU op-mode(s):                  32-bit, 64-bit
+     3  Byte Order:                      Little Endian
+     4  Address sizes:                   46 bits physical, 48 bits virtual
+     5  CPU(s):                          4
+
+	~/$ sed '1s/Architecture/ARchitecTUre/g' newspecs.txt
+
+    Output
+
+     1  ARchitecTUre,ARchitecTUre,ARchitecTUre:                    x86_64
+     2  CPU op-mode(s):                  32-bit, 64-bit
+     3  Byte Order:                      Little Endian
+     4  Address sizes:                   46 bits physical, 48 bits virtual
+     5  CPU(s):                          4
+
+	~/$ sed '1s/Architecture/ARchitecTUre/g' newspecs.txt | sed 's/ARCHITECTURE/Architonics/gi' > caseinsensitive.txt
+
+	~$ cat caseinsensitive.txt | grep Architonics
+
+    Output 
+   
+	1  Architonics,Architonics,Architonics:                    x86_64
+	
+
+	~/$ cat caseinsensitive.txt
+
+     Output
+
+     1  Architonics,Architonics,Architonics:                    x86_64
+     2  CPU op-mode(s):                  32-bit, 64-bit
+     3  Byte Order:                      Little Endian
+     4  Address sizes:                   46 bits physical, 48 bits virtual
+     5  CPU(s):                          4
+
+	~/$ sed '1s/Architonics/Architecture/3' caseinsensitive.txt | grep Architecture            #"Replace only 3rd occurance of word in 1st line"
+
+     Output 
+
+	1  Architonics,Architonics,Architecture:                    x86_64
+
+	~$ sed 's/Architecture/Architonics/1' updatedspecs.txt | grep -i  Architonics
+
+     Output
+
+        1  Architonics,Architecture,Architecture:                    x86_64
+        5  Architonics,NumberofCPUs(s):                          4
+
+******************* Original file Replacement (Use -i to directly replace content in original file) *******************
+
+Example:
+
+	~/$ cat updatedspecs.txt
+	
+     Output:
+
+     1  Architecture,Architecture,Architecture:                    x86_64
+     2  CPU op-mode(s):                  32-bit, 64-bit
+     3  Byte Order:                      Little Endian
+     4  Address sizes:                   46 bits physical, 48 bits virtual
+     5  Architecture,NumberofCPUs(s):                          4
+
+	~/$ sed -i 's/ORDER/SEQUENCE/gi' updatedspecs.txt
+
+     Output:
+
+     1  Architecture,Architecture,Architecture:                    x86_64
+     2  CPU op-mode(s):                  32-bit, 64-bit
+     3  Byte SEQUENCE:                      Little Endian
+     4  Address sizes:                   46 bits physical, 48 bits virtual
+     5  Architecture,NumberofCPUs(s):                          4
